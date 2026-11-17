@@ -3,6 +3,8 @@ paths:
   - "scripts/**/*.R"
   - "explorations/**"
   - "Figures/**/*.R"
+  - "scripts/**/*.py"
+  - "Figures/**/*.py"
 ---
 
 # Research Project Orchestrator (Simplified)

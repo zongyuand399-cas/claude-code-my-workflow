@@ -30,7 +30,7 @@ Spawn the **verifier** agent (via the `Agent` tool with `subagent_type=verifier`
 
 ### Step 0b: Consistency Gate (Pre-Commit)
 
-**Runs once per commit, here or in the git hook.** The gate is the full backtest suite — all eleven gates (surface-sync count claims like `"18 agents, 62 skills, 37 rules, 9 hooks"` and marked tables, skill integrity, model currency, links, spec conformance, staleness, repo hygiene, derived counts, ledger coverage, hook battery, portability).
+**Runs once per commit, here or in the git hook.** The gate is the full backtest suite — all eleven gates (surface-sync count claims like `"19 agents, 63 skills, 38 rules, 9 hooks"` and marked tables, skill integrity, model currency, links, spec conformance, staleness, repo hygiene, derived counts, ledger coverage, hook battery, portability).
 
 First decide where it runs. **Leave it to the git hook only when all three of these hold**, because only then is the hook sure to run this same suite on this commit. (It leaves out the hook battery when nothing the battery tests is staged, since the battery's result cannot change then; CI always runs everything.)
 

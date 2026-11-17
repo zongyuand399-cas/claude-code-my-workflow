@@ -2,6 +2,8 @@
 paths:
   - "scripts/**/*.R"
   - "Figures/**/*.R"
+  - "scripts/**/*.py"
+  - "Figures/**/*.py"
 ---
 
 # Replication-First Protocol

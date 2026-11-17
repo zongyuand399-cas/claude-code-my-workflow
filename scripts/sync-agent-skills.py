@@ -46,6 +46,7 @@ INCLUDE = [
     "audit-reproducibility", "replication-package", "capture-environment", "disclosure-check",
     "diagnose", "differential-audit", "blast-radius", "verify-artifact", "r-package-check",
     "review-r",
+    "review-python",
     # slides and teaching
     "create-lecture", "compile-latex", "deploy", "extract-tikz", "new-diagram", "syllabus",
     "teach-from-paper", "scaffold-exercises", "proofread", "visual-audit", "pedagogy-review",

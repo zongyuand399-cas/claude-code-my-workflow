@@ -3,6 +3,7 @@ paths:
   - "Slides/**/*.tex"
   - "Quarto/**/*.qmd"
   - "scripts/**/*.R"
+  - "scripts/**/*.py"
 ---
 
 # Quality Review & Scoring Rubrics
@@ -52,6 +53,20 @@ paths:
 | Major | Missing saved .rds of computed results | -5 | reviewer |
 | Minor | Style violation | -1 | reviewer |
 | Minor | Missing roxygen documentation | -1 | reviewer |
+
+### Python Scripts (.py)
+
+| Severity | Issue | Deduction | Caught by |
+|----------|-------|-----------|-----------|
+| Critical | Syntax error | -100 (auto-fail) | script |
+| Critical | Domain-specific bug | -30 | reviewer |
+| Critical | Hardcoded absolute path | -20 | script |
+| Critical | Missing/undeclared dependency | -10 | reviewer |
+| Major | Missing/global RNG seeding where randomness is used | -10 | script |
+| Major | Missing figure generation | -5 | reviewer |
+| Major | Missing saved output of computed results | -5 | reviewer |
+| Minor | Style violation | -1 | reviewer |
+| Minor | Missing docstring or type hints | -1 | reviewer |
 
 ### Beamer Slides (.tex)
 

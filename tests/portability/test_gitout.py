@@ -401,13 +401,22 @@ class QualityScoreSuffix(unittest.TestCase):
         self.assertEqual(rc, 1, out)
 
     def test_changed_files_without_a_rubric_are_skipped_not_failed(self):
-        # The PR checklist's `quality_score.py <changed-files>`: a passing script
-        # beside a .md and a .py exits 0, and the unscored types are still named.
+        # The PR checklist's `quality_score.py <changed-files>`: an untargeted type
+        # beside a passing script exits 0, and the unscored type is still named.
         # A regression pin, not an 08a7641 defect: 82a4590 exited 1 here.
-        rc, out = self.score("ok.R", GOOD_R, ("notes.md", "# n\n"), ("tool.py", "x = 1\n"))
+        # `.py` is no longer an example of an unscored type: this fork added
+        # PYTHON_RUBRIC and score_python_script, so .py is scored (see the fork's
+        # Python track in CHANGELOG.md). `.md` remains the unscored case.
+        rc, out = self.score("ok.R", GOOD_R, ("notes.md", "# n\n"))
         self.assertEqual(rc, 0, out)
         self.assertIn("Unsupported file type: .md", out)
-        self.assertIn("Unsupported file type: .py", out)
+
+    def test_python_scripts_are_scored_not_skipped(self):
+        # The fork's Python track: a .py goes through a real rubric, so a broken
+        # one auto-fails (exit 2) rather than passing as an unscored type.
+        rc, out = self.score("broken.py", "def f(:\n    return 1\n")
+        self.assertEqual(rc, 2, out)
+        self.assertNotIn("Unsupported file type: .py", out)
 
 
 class QualityScoreRscriptPath(unittest.TestCase):

@@ -5,6 +5,7 @@ paths:
   - "Quarto/**/*.scss"
   - "Preambles/header.tex"
   - "scripts/R/**/*.R"
+  - "scripts/**/*.py"
 ---
 
 # Content Invariants (INV-1 through INV-12)

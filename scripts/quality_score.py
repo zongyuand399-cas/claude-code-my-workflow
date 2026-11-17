@@ -15,6 +15,7 @@ Usage:
 
 import sys
 import os
+import ast
 import argparse
 import subprocess
 from pathlib import Path
@@ -80,6 +81,24 @@ R_SCRIPT_RUBRIC = {
     }
 }
 
+PYTHON_RUBRIC = {
+    'critical': {
+        'syntax_error': {'points': 100, 'auto_fail': True, 'label': 'Syntax error'},
+        'domain_bug': {'points': 30, 'label': 'Domain-specific bug'},
+        'hardcoded_path': {'points': 20, 'label': 'Hardcoded absolute path'},
+        'missing_import': {'points': 10, 'label': 'Missing/undeclared dependency'},
+    },
+    'major': {
+        'missing_seed': {'points': 10, 'label': 'Missing/global RNG seeding where randomness is used'},
+        'missing_figure': {'points': 5, 'label': 'Missing figure generation'},
+        'missing_artifact': {'points': 5, 'label': 'Missing saved output of computed results'},
+    },
+    'minor': {
+        'style_violation': {'points': 1, 'label': 'Style violation'},
+        'missing_docstring': {'points': 1, 'label': 'Missing docstring or type hints'},
+    }
+}
+
 BEAMER_RUBRIC = {
     'critical': {
         'compilation_failure': {'points': 100, 'auto_fail': True, 'label': 'Compilation failure (LaTeX syntax)'},
@@ -99,12 +118,14 @@ BEAMER_RUBRIC = {
 AUTO_DETECTED = {
     'quarto': {'compilation_failure', 'equation_overflow', 'broken_citation', 'missing_plotly_chart'},
     'r': {'syntax_error', 'hardcoded_path', 'missing_set_seed'},
+    'python': {'syntax_error', 'hardcoded_path', 'missing_seed'},
     'beamer': {'compilation_failure', 'undefined_citation', 'overfull_hbox'},
 }
 
 RUBRICS = [
     ('quarto', 'Quarto Slides (.qmd)', QUARTO_RUBRIC),
     ('r', 'R Scripts (.R)', R_SCRIPT_RUBRIC),
+    ('python', 'Python Scripts (.py)', PYTHON_RUBRIC),
     ('beamer', 'Beamer Slides (.tex)', BEAMER_RUBRIC),
 ]
 
@@ -295,6 +316,27 @@ class IssueDetector:
             return None, f"syntax not verified — parse exceeded {limit}s (raise QUALITY_RSCRIPT_TIMEOUT)"
         except FileNotFoundError:
             return None, "syntax not verified — Rscript not installed"
+
+    @staticmethod
+    def check_python_syntax(filepath: Path) -> Tuple[Optional[bool], str]:
+        """Parse the Python file with ast. Returns True (ok), False (syntax
+        error), or None (could-not-verify).
+
+        ast.parse of the FILE'S TEXT, not an import: importing would execute
+        module-level code, and an analysis script that writes files or runs a
+        40-minute job must be scoreable without doing either.
+        """
+        try:
+            source = filepath.read_text(encoding='utf-8')
+        except (OSError, UnicodeDecodeError) as e:
+            return None, f"syntax not verified — could not read file: {e}"
+        try:
+            ast.parse(source, filename=str(filepath))
+            return True, ""
+        except SyntaxError as e:
+            return False, f"{e.msg} (line {e.lineno})"
+        except ValueError as e:            # e.g. source containing null bytes
+            return False, str(e)
 
     @staticmethod
     def check_hardcoded_paths(content: str) -> List[int]:
@@ -568,6 +610,54 @@ class QualityScorer:
         self.score = max(0, self.score)
         return self._generate_report()
 
+    def score_python_script(self) -> Dict:
+        """Score Python script quality."""
+        content = self.filepath.read_text(encoding='utf-8')
+
+        # Check syntax. None = could-not-verify: record a note, keep static checks.
+        is_valid, error = IssueDetector.check_python_syntax(self.filepath)
+        if is_valid is False:
+            self.auto_fail = True
+            self.issues['critical'].append({
+                'type': 'syntax_error',
+                'description': 'Python syntax error',
+                'details': error[:200],
+                'points': pts(PYTHON_RUBRIC, 'critical', 'syntax_error')
+            })
+            self.score = 0
+            return self._generate_report()
+        if is_valid is None:
+            self.unverified.append(error)
+
+        # Check hardcoded paths
+        for line in IssueDetector.check_hardcoded_paths(content):
+            self.issues['critical'].append({
+                'type': 'hardcoded_path',
+                'description': f'Hardcoded absolute path at line {line}',
+                'details': 'Build paths with pathlib.Path relative to the repo root',
+                'points': pts(PYTHON_RUBRIC, 'critical', 'hardcoded_path')
+            })
+            self.score -= pts(PYTHON_RUBRIC, 'critical', 'hardcoded_path')
+
+        # Seeding. The standard is one default_rng at the top passed down; a bare
+        # np.random.seed inside a loop re-seeds and silently repeats streams, so it
+        # does not count as seeding either.
+        random_calls = ['np.random.', 'numpy.random.', 'random.random', 'random.randint',
+                        'random.choice', 'random.shuffle', 'rng.', 'default_rng']
+        has_random = any(fn in content for fn in random_calls)
+        has_seed = bool(re.search(r'default_rng\s*\(|SeedSequence\s*\(', content))
+        if has_random and not has_seed:
+            self.issues['major'].append({
+                'type': 'missing_seed',
+                'description': 'Missing RNG seeding for reproducibility',
+                'details': 'Add rng = np.random.default_rng(YYYYMMDD) once at the top and pass it down',
+                'points': pts(PYTHON_RUBRIC, 'major', 'missing_seed')
+            })
+            self.score -= pts(PYTHON_RUBRIC, 'major', 'missing_seed')
+
+        self.score = max(0, self.score)
+        return self._generate_report()
+
     def score_beamer(self) -> Dict:
         """Score Beamer/LaTeX lecture slides."""
         content = self.filepath.read_text(encoding='utf-8')
@@ -835,6 +925,8 @@ Exit Codes:
                 report = scorer.score_quarto()
             elif suffix == '.r':
                 report = scorer.score_r_script()
+            elif suffix == '.py':
+                report = scorer.score_python_script()
             elif suffix == '.tex':
                 report = scorer.score_beamer()
             else:

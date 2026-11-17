@@ -5,8 +5,8 @@
      Keep this file under ~200 lines (official guidance) — Claude loads it every session.
      See the guide at docs/workflow-guide.html for full documentation. -->
 
-**Project:** [YOUR PROJECT NAME]
-**Institution:** [YOUR INSTITUTION]
+**Project:** Zongyuan Deng — lecture slides + research code (CEIBS)
+**Institution:** CEIBS (China Europe International Business School)
 **Branch:** main
 
 ---
@@ -28,7 +28,7 @@ and the usual outcome is that all four get thrown away.
 ## Core Principles
 
 - **Plan first** -- enter plan mode before non-trivial tasks; save plans to `quality_reports/plans/`
-- **Verify after** -- when a task changes a `.tex`, `.qmd`, or `.R` file, compile or render it and confirm the output before reporting done
+- **Verify after** -- when a task changes a `.tex`, `.qmd`, `.R`, or `.py` file, compile or render or re-run it and confirm the output before reporting done
 - **Single source of truth** -- Beamer `.tex` is authoritative; Quarto `.qmd` derives from it
 - **Quality gates** -- nothing ships below 80/100
 - **[LEARN] tags** -- when corrected, save `[LEARN:category] wrong → right` to [MEMORY.md](MEMORY.md)
@@ -62,7 +62,7 @@ Nothing clears work until it has a row in [`quality_reports/qualification/LEDGER
 ## Folder Structure
 
 ```
-[YOUR-PROJECT]/
+claude-code-my-workflow/
 ├── CLAUDE.MD                    # This file
 ├── .claude/                     # Rules, skills, agents, hooks
 ├── Bibliography_base.bib        # Centralized bibliography
@@ -72,6 +72,8 @@ Nothing clears work until it has a row in [`quality_reports/qualification/LEDGER
 ├── Quarto/                      # RevealJS .qmd files + theme
 ├── docs/                        # GitHub Pages (auto-generated)
 ├── scripts/                     # Utility scripts + analysis code (numbered stages)
+│   ├── R/                       # R analysis scripts
+│   └── py/                      # Python analysis scripts
 ├── output/                      # Generated tables, figures, logs (created by the code)
 ├── quality_reports/             # Plans, session logs, merge reports, decision records
 ├── explorations/                # Research sandbox (see rules)
@@ -93,8 +95,9 @@ TEXINPUTS=../Preambles:$TEXINPUTS xelatex -interaction=nonstopmode file.tex
 # Deploy Quarto to GitHub Pages
 ./scripts/sync_to_docs.sh LectureN
 
-# Quality score
+# Quality score (rubrics exist for .qmd, .tex, .R, .py)
 python3 scripts/quality_score.py Quarto/file.qmd
+python3 scripts/quality_score.py scripts/py/analysis.py
 
 # Palette sync (LaTeX ↔ SCSS)
 ./scripts/check-palette-sync.sh
@@ -128,6 +131,7 @@ The full table of all skills lives in [README.md](README.md#skills-claudeskills)
 - **Slides / teaching:** `/create-lecture` `/compile-latex` `/deploy` `/qa-quarto` `/slide-excellence` `/syllabus` `/teach-from-paper` `/scaffold-exercises`
 - **Papers / review:** `/review-paper` (`--peer`) `/seven-pass-review` `/respond-to-referees` `/verify-claims` `/proofread` `/humanize` `/submission-disclosures`
 - **Data / reproducibility:** `/data-analysis` `/simulation-study` `/audit-reproducibility` `/diagnose` `/replication-package` `/capture-environment` `/power-analysis` `/disclosure-check`
+- **Code review:** `/review-r` (R) `/review-python` (Python) — both read-only; the report goes to you
 - **Research / writing:** `/interview-me` `/lit-review` `/research-ideation` `/preregister` `/grant-proposal` `/data-management-plan`
 - **Verification / rigor:** `/vaccinate` `/challenge` `/oracle-review` `/adjudicate-review` `/differential-audit` `/blast-radius` `/verify-artifact` `/credible-claims` `/deep-audit`
 - **Meta / workflow:** `/commit` `/learn` `/new-skill` `/checkpoint` `/context-status` `/deep-audit` `/coauthor-brief` `/triage-inbox` `/issues`
@@ -162,4 +166,4 @@ Stata (`/stata-replication`), R packages (`/r-package-check`), TikZ (`/extract-t
 | Lecture | Beamer | Quarto | Key Content |
 | --- | --- | --- | --- |
 | HelloWorld *(sample — delete when ready)* | `HelloWorld.tex` | `HelloWorld.qmd` | Minimal deck to verify setup |
-| 1: [Topic] | `Lecture01_Topic.tex` | `Lecture1_Topic.qmd` | [Brief description] |
+| *No lectures yet* | — | — | Add a row per lecture as you create it |

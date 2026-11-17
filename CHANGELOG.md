@@ -6,6 +6,38 @@ If you have forked this template, see the **Upgrading** section at the bottom fo
 
 ---
 
+## v2.9.3 — 2026-11-17
+
+Fork release 1. First sync of the CEIBS fork: the fork was reset onto upstream v2.9.2 (it had been
+pinned at v2.1.0 since 2026-06-10), and a Python track was added beside the existing R
+track. R support is unchanged — every R rule, agent and skill is still present and
+still path-scoped. Nothing in the R track loads while you are editing a `.py` file.
+
+### Added
+
+- **`.claude/rules/python-code-conventions.md`** — analysis-script standards for Python:
+  one `np.random.default_rng(YYYYMMDD)` at the top passed down as an argument,
+  `pathlib` paths, type hints, the CEIBS palette as module constants with a
+  `theme_custom()` that sets `savefig.transparent`, the saved-artifact pattern
+  (parquet / `.npz`, `pickle` only for objects Python alone reloads), a pitfall table
+  for the pandas/numpy traps that change an answer silently, and the same seven
+  numerical-discipline rules as the R standards in Python dress.
+- **`python-reviewer` agent** — read-only, `tools: Read, Grep, Glob`, 11 review
+  categories mirroring `r-reviewer`, ending in the shared findings `json` contract.
+- **`/review-python` skill** — the read-only launcher for it, mirroring `/review-r`
+  (no `Edit`/`MultiEdit`; the report goes to the user, fixes are applied after review).
+
+### Fixed
+
+- Guide and README inventory counts re-derived for the two added files (65 count
+  assertions across 8 surfaces), and both rendered guide copies re-rendered with
+  Quarto 1.8.27 so the source/render stamp holds.
+
+**Inventory at release: 63 skills, 19 agents, 38 rules, 9 hooks, 11 gates**
+(standing hook battery: 123 cases, seconds to run; portability suite: 134 cases).
+
+---
+
 ## v2.9.2 — 2026-11-07
 
 Small fixes found during and after the v2.9.1 work, in compaction, in `/commit` and `/verify`, and in the git pre-commit hook. Nothing to migrate.

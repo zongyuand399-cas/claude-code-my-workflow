@@ -5,6 +5,10 @@ paths:
   - "**/*_mc.R"
   - "scripts/**/simulations/**"
   - "explorations/**/*.R"
+  - "**/*simulation*.py"
+  - "**/*_sim.py"
+  - "**/*_mc.py"
+  - "explorations/**/*.py"
 ---
 
 # Monte Carlo Simulation Standards

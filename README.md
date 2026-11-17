@@ -198,7 +198,7 @@ This workflow is designed as a **single hub for an entire research program** —
 ## What's Included
 
 <details>
-<summary><strong>18 agents, 62 skills, 37 rules, 9 hooks</strong> (click to expand)</summary>
+<summary><strong>19 agents, 63 skills, 38 rules, 9 hooks</strong> (click to expand)</summary>
 
 ### Agents (`.claude/agents/`)
 
@@ -209,6 +209,7 @@ This workflow is designed as a **single hub for an entire research program** —
 | `slide-auditor` | Visual layout audit (overflow, font consistency, spacing) |
 | `pedagogy-reviewer` | 13-pattern pedagogical review (narrative arc, notation density, pacing) |
 | `r-reviewer` | R code quality, reproducibility, and domain correctness |
+| `python-reviewer` (fork) | Python code quality, reproducibility, pandas/numpy correctness, and domain correctness |
 | `tikz-reviewer` | Merciless TikZ diagram visual critique |
 | `beamer-translator` | Beamer-to-Quarto translation specialist |
 | `quarto-critic` | Adversarial QA comparing Quarto against Beamer benchmark |
@@ -242,6 +243,7 @@ This workflow is designed as a **single hub for an entire research program** —
 | `/visual-audit` | Visual layout audit of a deck (the `slide-auditor` checks, run inline) |
 | `/pedagogy-review` | Launch pedagogy-reviewer on a file |
 | `/review-r` | Launch R code reviewer |
+| `/review-python` (fork) | Launch Python code reviewer |
 | `/qa-quarto` | Adversarial critic-fixer loop (loops until dry; 5-round cap is a fallback) |
 | `/slide-excellence` | Combined multi-agent review |
 | `/translate-to-quarto` | Full Beamer-to-Quarto translation — Phase 0 pre-flight plus 12 translation phases (1–11 and a 6.5 pedagogy review) |
